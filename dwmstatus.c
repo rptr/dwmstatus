@@ -17,8 +17,6 @@
 
 #include <X11/Xlib.h>
 
-char *tzargentina = "America/Buenos_Aires";
-char *tzutc = "UTC";
 char *tzberlin = "Europe/Berlin";
 
 static Display *dpy;
@@ -171,8 +169,6 @@ main(void)
 	char *avgs;
 	char *bat;
 	char *bat1;
-	char *tmar;
-	char *tmutc;
 	char *tmbln;
 
 	if (!(dpy = XOpenDisplay(NULL))) {
@@ -180,24 +176,20 @@ main(void)
 		return 1;
 	}
 
-	for (;;sleep(60)) {
+	for (;;sleep(1)) {
 		avgs = loadavg();
 		bat = getbattery("/sys/class/power_supply/BAT0");
 		bat1 = getbattery("/sys/class/power_supply/BAT1");
-		tmar = mktimes("%H:%M", tzargentina);
-		tmutc = mktimes("%H:%M", tzutc);
-		tmbln = mktimes("KW %W %a %d %b %H:%M %Z %Y", tzberlin);
+		tmbln = mktimes("%a Wk %W | %H:%M:%S | %d-%m-%Y", tzberlin);
 
-		status = smprintf("L:%s | B:%s %s | A:%s | U:%s %s",
-				avgs, bat, bat1, tmar, tmutc,
+		status = smprintf("%s | %s %s | %s",
+				avgs, bat, bat1,
 				tmbln);
 		setstatus(status);
 
 		free(avgs);
 		free(bat);
 		free(bat1);
-		free(tmar);
-		free(tmutc);
 		free(tmbln);
 		free(status);
 	}
