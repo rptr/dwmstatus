@@ -164,17 +164,6 @@ getbattery(char *base)
 	return smprintf("%.0f%%%c", ((float)remcap / (float)descap) * 100, status);
 }
 
-char *
-gettemperature(char *base, char *sensor)
-{
-	char *co;
-
-	co = readfile(base, sensor);
-	if (co == NULL)
-		return smprintf("");
-	return smprintf("%02.0f°C", atof(co) / 1000);
-}
-
 int
 main(void)
 {
@@ -185,7 +174,6 @@ main(void)
 	char *tmar;
 	char *tmutc;
 	char *tmbln;
-	char *t0, *t1, *t2;
 
 	if (!(dpy = XOpenDisplay(NULL))) {
 		fprintf(stderr, "dwmstatus: cannot open display.\n");
@@ -199,18 +187,12 @@ main(void)
 		tmar = mktimes("%H:%M", tzargentina);
 		tmutc = mktimes("%H:%M", tzutc);
 		tmbln = mktimes("KW %W %a %d %b %H:%M %Z %Y", tzberlin);
-		t0 = gettemperature("/sys/devices/virtual/hwmon/hwmon0", "temp1_input");
-		t1 = gettemperature("/sys/devices/virtual/hwmon/hwmon2", "temp1_input");
-		t2 = gettemperature("/sys/devices/virtual/hwmon/hwmon4", "temp1_input");
 
-		status = smprintf("T:%s|%s|%s L:%s B:%s|%s A:%s U:%s %s",
-				t0, t1, t2, avgs, bat, bat1, tmar, tmutc,
+		status = smprintf("L:%s | B:%s %s | A:%s | U:%s %s",
+				avgs, bat, bat1, tmar, tmutc,
 				tmbln);
 		setstatus(status);
 
-		free(t0);
-		free(t1);
-		free(t2);
 		free(avgs);
 		free(bat);
 		free(bat1);
